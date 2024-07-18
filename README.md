@@ -42,7 +42,7 @@ Welcome to **RAG in Memory**! This application allows you to upload a PDF, creat
     Open the `.env` file (create the file if it does not exist) and add your OpenAI API key:
 
     ```env
-    OPENAI_API_KEY=sk-your-api-key-here
+    OPENAI_KEY=sk-your-api-key-here
     ```
 
 ## How to Use It
