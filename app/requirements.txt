@@ -8,3 +8,4 @@ langchain_community
 python-dotenv
 requests
 nomic
+python-docx
