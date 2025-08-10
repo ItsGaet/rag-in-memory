@@ -61,4 +61,3 @@ async def chat_with_document(
         raise HTTPException(status_code=500, detail=f"Error communicating with LLM: {e}")
 
     return ChatResponse(answer=answer, context=context_chunks)
-

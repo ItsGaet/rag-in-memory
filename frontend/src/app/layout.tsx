@@ -4,7 +4,8 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import TanstackProvider from "@/components/tanstack-provider";
-import { ModeToggle } from "@/components/mode-toggle";
+import { UserNav } from "@/components/user-nav";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,13 +33,14 @@ export default function RootLayout({
               <header className="border-b">
                 <div className="container mx-auto flex h-16 items-center justify-between px-4">
                   <div className="font-bold">G-AI</div>
-                  <ModeToggle />
+                  <UserNav />
                 </div>
               </header>
               <main className="flex-grow container mx-auto px-4 py-8">
                 {children}
               </main>
             </div>
+            <Toaster />
           </TanstackProvider>
         </ThemeProvider>
       </body>

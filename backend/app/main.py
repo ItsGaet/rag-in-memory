@@ -45,6 +45,7 @@ app.include_router(
 async def read_root():
     return {"message": "Welcome to G-AI Backend"}
 
+
 @app.get("/health", tags=["Health Check"])
 def health_check():
     """

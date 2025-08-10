@@ -6,6 +6,7 @@ import * as z from "zod"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 
+import { useAuthStore } from "@/store/auth"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -50,11 +51,12 @@ const loginUser = async (data: z.infer<typeof formSchema>) => {
 
 export default function LoginPage() {
   const router = useRouter()
+  const { setToken } = useAuthStore()
+
   const mutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // In a real app, you'd save the token to local storage or a cookie
-      console.log("Login successful", data)
+      setToken(data.access_token)
       // Redirect to a protected page
       router.push("/dashboard")
     },

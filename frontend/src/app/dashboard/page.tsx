@@ -1,50 +1,63 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
-import { fetchApi } from "@/lib/api"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
+import { useAuthStore } from "@/store/auth"
+import { DocumentUpload } from "@/components/document-upload"
+import { DocumentList } from "@/components/document-list"
+import { ChatInterface } from "@/components/chat-interface"
 
-// This is a placeholder for fetching user data
-const getUser = async () => {
-  // This endpoint requires authentication. We'll need to handle tokens.
-  // For now, let's assume the browser's cookies handle the session.
-  try {
-    const data = await fetchApi('/users/me');
-    return data;
-  } catch (error) {
-    // This will likely fail if we don't handle auth tokens,
-    // which we haven't yet. We'll need to implement token storage
-    // and sending it with requests.
-    console.error("Failed to fetch user", error);
-    return null;
-  }
-};
-
+interface Document {
+  id: number;
+  filename: string;
+  created_at: string;
+}
 
 export default function DashboardPage() {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user'],
-    queryFn: getUser,
-  })
+  const { user } = useAuthStore()
+  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null)
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Welcome!</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading && <p>Loading user data...</p>}
-          {error && <p className="text-red-500">Could not load user data. Are you logged in?</p>}
-          {user && (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome back, <strong>{user?.full_name || user?.email}</strong>!
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <p>Welcome back, <strong>{user.full_name || user.email}</strong>!</p>
-              <p className="text-sm text-muted-foreground">You are now ready to chat with your documents.</p>
+              <h2 className="text-2xl font-semibold">1. Upload a Document</h2>
+              <p className="text-sm text-muted-foreground">
+                Upload a new PDF, TXT, or DOCX file.
+              </p>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <DocumentUpload />
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-semibold">2. Select a Document</h2>
+              <p className="text-sm text-muted-foreground">
+                Click on a document to start a chat session.
+              </p>
+            </div>
+            <DocumentList onDocumentSelect={setSelectedDoc} selectedDocumentId={selectedDoc?.id} />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+           <div>
+            <h2 className="text-2xl font-semibold">3. Chat</h2>
+            <p className="text-sm text-muted-foreground">
+              Ask questions about your selected document.
+            </p>
+          </div>
+          <ChatInterface documentId={selectedDoc?.id} documentName={selectedDoc?.filename} />
+        </div>
+      </div>
     </div>
   )
 }
