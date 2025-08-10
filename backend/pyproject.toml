@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g-ai-backend"
+version = "0.1.0"
+description = "Backend for the G-AI application."
+authors = [{ name = "Jules", email = "jules@example.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "gunicorn",
+    "pydantic",
+    "pydantic-settings",
+    "sqlalchemy",
+    "psycopg2-binary",
+    "asyncpg",
+    "qdrant-client",
+    "fastapi-users[sqlalchemy]",
+    "python-jose[cryptography]",
+    "python-multipart",
+    "langchain",
+    "langchain-community",
+    "langchain-ollama",
+    "PyPDF2",
+    "python-docx",
+    "httpx",
+    "aiosqlite"
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-dotenv"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["tests*"]
