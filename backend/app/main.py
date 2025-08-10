@@ -1,10 +1,8 @@
 from fastapi import FastAPI, Depends
 import fastapi_users
 
-from .core.security import auth_backend, get_user_manager
-from .core.config import settings
+from .core.security import auth_backend, fastapi_users_instance
 from .schemas.user import UserRead, UserCreate, UserUpdate
-from .models.user import User
 from .core.db import Base, async_engine
 
 app = FastAPI(
@@ -20,29 +18,27 @@ async def on_startup():
         # await conn.run_sync(Base.metadata.drop_all) # Use for development to clear tables
         await conn.run_sync(Base.metadata.create_all)
 
-# Auth routes from fastapi-users
-auth_router = fastapi_users.get_auth_router(auth_backend)
-register_router = fastapi_users.get_register_router(UserRead, UserCreate)
-reset_password_router = fastapi_users.get_reset_password_router()
-verify_router = fastapi_users.get_verify_router(UserRead)
-users_router = fastapi_users.get_users_router(
-    UserRead,
-    UserUpdate,
-    requires_verification=False, # Set to True in production
-)
-
 from .api.v1.api import api_router
 
-# Include routers
 # Main application API
 app.include_router(api_router, prefix="/api/v1")
 
-# Auth routes
-app.include_router(auth_router, prefix="/auth/jwt", tags=["Auth"])
-app.include_router(register_router, prefix="/auth", tags=["Auth"])
-app.include_router(reset_password_router, prefix="/auth", tags=["Auth"])
-app.include_router(verify_router, prefix="/auth", tags=["Auth"])
-app.include_router(users_router, prefix="/users", tags=["Users"])
+# Auth routes from fastapi-users
+app.include_router(
+    fastapi_users_instance.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["Auth"]
+)
+app.include_router(
+    fastapi_users_instance.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["Auth"]
+)
+app.include_router(
+    fastapi_users_instance.get_reset_password_router(), prefix="/auth", tags=["Auth"]
+)
+app.include_router(
+    fastapi_users_instance.get_verify_router(UserRead), prefix="/auth", tags=["Auth"]
+)
+app.include_router(
+    fastapi_users_instance.get_users_router(UserRead, UserUpdate), prefix="/users", tags=["Users"]
+)
 
 
 @app.get("/", tags=["Root"])
