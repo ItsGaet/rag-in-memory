@@ -1,22 +1,25 @@
 import uuid
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID
-from ..core.db import Base
+from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, Field
 
-class Document(Base):
-    __tablename__ = "documents"
+# Base schema for documents, includes common fields
+class DocumentBase(BaseModel):
+    filename: str = Field(..., description="The name of the file.")
+    content_type: str = Field(..., description="The MIME type of the file.")
+    size_bytes: int = Field(..., description="The size of the file in bytes.")
 
-    id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String, index=True, nullable=False)
-    content_type = Column(String)
-    size_bytes = Column(Integer)
+# Schema for creating a new document (used for POST requests)
+class DocumentCreate(DocumentBase):
+    pass
 
-    # We can use a UUID for the collection name to ensure uniqueness
-    qdrant_collection_id = Column(UUID(as_uuid=True), primary_key=False, default=uuid.uuid4, unique=True)
+# Schema for reading a document (used for GET responses)
+class DocumentRead(DocumentBase):
+    id: int
+    qdrant_collection_id: uuid.UUID
+    owner_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
 
-    owner_id = Column(Integer, ForeignKey("users.id"))
-    owner = relationship("User") #, back_populates="documents")
-
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    class Config:
+        orm_mode = True

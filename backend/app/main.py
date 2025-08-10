@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
-import fastapi_users
-
-from .core.security import auth_backend, get_user_manager
+# The direct import of fastapi_users is no longer sufficient.
+# We need to import the specific instance from our security core.
+from .core.security import auth_backend, get_user_manager, fastapi_users_instance
 from .core.config import settings
 from .schemas.user import UserRead, UserCreate, UserUpdate
 from .models.user import User
@@ -20,12 +20,13 @@ async def on_startup():
         # await conn.run_sync(Base.metadata.drop_all) # Use for development to clear tables
         await conn.run_sync(Base.metadata.create_all)
 
-# Auth routes from fastapi-users
-auth_router = fastapi_users.get_auth_router(auth_backend)
-register_router = fastapi_users.get_register_router(UserRead, UserCreate)
-reset_password_router = fastapi_users.get_reset_password_router()
-verify_router = fastapi_users.get_verify_router(UserRead)
-users_router = fastapi_users.get_users_router(
+# We define the routers using the 'fastapi_users_instance'
+# instead of the module itself.
+auth_router = fastapi_users_instance.get_auth_router(auth_backend)
+register_router = fastapi_users_instance.get_register_router(UserRead, UserCreate)
+reset_password_router = fastapi_users_instance.get_reset_password_router()
+verify_router = fastapi_users_instance.get_verify_router(UserRead)
+users_router = fastapi_users_instance.get_users_router(
     UserRead,
     UserUpdate,
     requires_verification=False, # Set to True in production
@@ -44,11 +45,9 @@ app.include_router(reset_password_router, prefix="/auth", tags=["Auth"])
 app.include_router(verify_router, prefix="/auth", tags=["Auth"])
 app.include_router(users_router, prefix="/users", tags=["Users"])
 
-
 @app.get("/", tags=["Root"])
 async def read_root():
     return {"message": "Welcome to G-AI Backend"}
-
 
 @app.get("/health", tags=["Health Check"])
 def health_check():
