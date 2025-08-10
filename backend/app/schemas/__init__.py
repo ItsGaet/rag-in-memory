@@ -1,2 +1,2 @@
 # This file makes the 'schemas' directory a Python package.
-from .document import DocumentCreate, DocumentRead, DocumentUpdate
+from .document import DocumentCreate, DocumentRead

@@ -1,25 +1,20 @@
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from app.db.base_class import Base
 import uuid
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, Field
 
-# Base schema for documents, includes common fields
-class DocumentBase(BaseModel):
-    filename: str = Field(..., description="The name of the file.")
-    content_type: str = Field(..., description="The MIME type of the file.")
-    size_bytes: int = Field(..., description="The size of the file in bytes.")
+class Document(Base):
+    __tablename__ = "documents"
 
-# Schema for creating a new document (used for POST requests)
-class DocumentCreate(DocumentBase):
-    pass
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String, nullable=False)
+    content_type = Column(String, nullable=False)
+    size_bytes = Column(Integer, nullable=False)
+    qdrant_collection_id = Column(UUID(as_uuid=True), default=uuid.uuid4)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=True)
 
-# Schema for reading a document (used for GET responses)
-class DocumentRead(DocumentBase):
-    id: int
-    qdrant_collection_id: uuid.UUID
-    owner_id: int
-    created_at: datetime
-    updated_at: Optional[datetime]
-
-    class Config:
-        orm_mode = True
+    owner = relationship("User", back_populates="documents")
