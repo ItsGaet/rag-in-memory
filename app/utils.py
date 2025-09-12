@@ -1,4 +1,3 @@
-# utils.py
 import json
 import time
 import requests
@@ -12,6 +11,12 @@ OLLAMA_BASE_URL = "http://172.28.5.155:11434"
 
 @st.cache_data(ttl=30)
 def check_ollama_connection():
+    """
+    Checks the connection to the Ollama server and retrieves the list of available models.
+
+    Returns:
+        tuple: A tuple containing a boolean indicating the connection status and a list of model names.
+    """
     try:
         response = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=5)
         if response.status_code == 200:
@@ -22,9 +27,18 @@ def check_ollama_connection():
         return False, []
 
 @st.cache_data
-def process_pdf(pdf_file):
+def process_pdf(_pdf_file):
+    """
+    Processes a PDF file, extracts text, splits it into chunks, and creates a knowledge base.
+
+    Args:
+        _pdf_file: The PDF file to process.
+
+    Returns:
+        tuple: A tuple containing the knowledge base, the text chunks, and the total number of characters.
+    """
     with st.spinner("🔄 Processing PDF..."):
-        pdf_reader = PdfReader(pdf_file)
+        pdf_reader = PdfReader(_pdf_file)
         text = "".join(page.extract_text() for page in pdf_reader.pages if page.extract_text())
 
         text_splitter = CharacterTextSplitter(
@@ -41,6 +55,17 @@ def process_pdf(pdf_file):
         return knowledge_base, chunks, len(text)
 
 def stream_ollama_response(context, question, model_settings):
+    """
+    Streams a response from the Ollama model based on the given context and question.
+
+    Args:
+        context (list): A list of documents to provide as context.
+        question (str): The user's question.
+        model_settings (dict): A dictionary of settings for the model.
+
+    Returns:
+        tuple: A tuple containing the full response text and the elapsed time.
+    """
     prompt = "Contesto:\n"
     for i, doc in enumerate(context):
         prompt += f"Documento {i+1}:\n{doc.page_content}\n\n"
