@@ -1,8 +1,10 @@
 streamlit
 PyPDF2
 langchain
+langchain_text_splitters
 faiss-cpu
-openai
 tiktoken
 langchain_community
 python-dotenv
+requests
+nomic
