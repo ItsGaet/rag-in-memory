@@ -29,7 +29,7 @@ def display_uploaded_files():
             with col1:
                 st.markdown(f"**{f['name']}** - {round(f['size'] / 1024, 1)} KB")
             with col2:
-                if st.button("❌", key=f"remove_{i}"):
+                if st.button("❌", key=f"remove_{i}", help="Rimuovi questo file"):
                     st.session_state.uploaded_files.pop(i)
                     rebuild_knowledge_base()
                     st.rerun()
@@ -89,6 +89,9 @@ def display_chat_history():
     """
     Displays the chat history.
     """
+    if not st.session_state.messages:
+        st.info("👋 Benvenuto! Carica un PDF e inizia a fare domande sul suo contenuto.")
+
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
@@ -109,7 +112,6 @@ def handle_chat_input():
 
         with st.chat_message("assistant"):
             response_text, _ = stream_ollama_response(docs, user_input, st.session_state.model_settings)
-            st.markdown(response_text)
 
         st.session_state.messages.append({"role": "assistant", "content": response_text})
 

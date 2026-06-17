@@ -95,8 +95,8 @@ def stream_ollama_response(context, question, model_settings):
                     chunk = json.loads(line)
                     if 'response' in chunk:
                         full_response += chunk['response']
-                        response_placeholder.markdown(f"```markdown\n{full_response}▌\n```")
-            response_placeholder.markdown(f"```markdown\n{full_response}\n```")
+                        response_placeholder.markdown(f"{full_response}▌")
+            response_placeholder.markdown(full_response)
         return full_response, time.time() - start_time
     except Exception as e:
         error_msg = f"Errore durante la generazione: {str(e)}"
